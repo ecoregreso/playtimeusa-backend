@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const cors = require("cors");
 
@@ -10,7 +9,6 @@ app.use(express.json());
 app.post("/login", (req, res) => {
   const { userCode, pin } = req.body;
 
-  // Temporary hardcoded ticket check
   if (userCode === "123456" && pin === "654321") {
     res.json({ success: true, credits: 100 });
   } else {
