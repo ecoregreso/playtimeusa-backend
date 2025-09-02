@@ -1,67 +1,30 @@
+// server.js
+require('dotenv').config(); // Load .env
 const express = require('express');
-const QRCode = require('qrcode');
-const path = require('path');
-const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
+const QRCode = require('qrcode'); // only if you need QR generation
 
-mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
-
-
-app.use(cors());
-
-// Use Render port or fallback to 3000 locally
-const port = process.env.PORT || 3000;
+const app = express();
 
 // Middleware
-app.use(cors({ origin: '*' })); // Replace '*' with your frontend domain in production
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // for form submissions
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Set EJS as the view engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// MongoDB Connection
+const mongoURI = process.env.DB_URI;
 
-// Helper function to generate 6-digit codes
-function generate6Digit() {
-  return Math.floor(100000 + Math.random() * 900000);
-}
+mongoose.connect(mongoURI)
+  .then(() => console.log('✅ MongoDB connected successfully'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Home page (voucher form)
+// Simple test route
 app.get('/', (req, res) => {
-  res.render('index');
-});
-
-// Voucher page
-app.post('/cashier/voucher', async (req, res) => {
-  const { amount } = req.body;
-
-  if (!amount || amount <= 0) return res.send('Amount must be greater than 0');
-
-  const userCode = generate6Digit();
-  const pin = generate6Digit();
-  const bonus = Math.floor(amount * 0.1);
-
-  // Generate QR code as base64
-  const qrCode = await QRCode.toDataURL(`${userCode}-${pin}`);
-
-  res.render('voucher', {
-    userCode,
-    pin,
-    amount,
-    bonus,
-    qrCode
-  });
+  res.send('Server is running');
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
-
