@@ -1,112 +1,70 @@
-// server.js
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const QRCode = require('qrcode');
-const jwt = require('jsonwebtoken');
-const path = require('path');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const jwt = require("jsonwebtoken");
+const QRCode = require("qrcode");
+
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+const MONGO_URI = process.env.DB_URI;
 
-// ========================
 // Middleware
-// ========================
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: "*" })); // TODO: lock to your frontend domain in prod
 app.use(express.json());
 
 // ========================
 // MongoDB Connection
 // ========================
-const mongoUri =
-  process.env.DB_URI ||
-  `mongodb+srv://${process.env.DB_USER}:${encodeURIComponent(process.env.DB_PASS)}@${process.env.DB_HOST}${process.env.DB_NAME}?retryWrites=true&w=majority`;
-
 mongoose
-  .connect(mongoUri)
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+  .connect(MONGO_URI)
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err.message);
+    process.exit(1); // stop server if DB fails
+  });
 
 // ========================
-// Models
+// Example Routes
 // ========================
-const VoucherSchema = new mongoose.Schema({
-  code: { type: String, required: true, unique: true },
-  pin: { type: String, required: true },
-  balance: { type: Number, required: true, default: 0 },
-  createdAt: { type: Date, default: Date.now },
+
+// Health check
+app.get("/", (req, res) => {
+  res.json({ message: "Casino backend is running 🚀" });
 });
 
-const Voucher = mongoose.model('Voucher', VoucherSchema);
-
-// ========================
-// Voucher Routes
-// ========================
-
-// Create a voucher
-app.post('/voucher', async (req, res) => {
-  try {
-    const { code, pin, balance } = req.body;
-    if (!code || !pin) {
-      return res.status(400).json({ error: 'Code and PIN required' });
-    }
-    const voucher = new Voucher({ code, pin, balance });
-    await voucher.save();
-    res.json({ success: true, voucher });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+// Voucher example
+app.post("/voucher", (req, res) => {
+  const { userId, amount } = req.body;
+  if (!userId || !amount) {
+    return res.status(400).json({ error: "Missing userId or amount" });
   }
+  // Example only – replace with DB logic
+  const voucherCode = Math.floor(100000 + Math.random() * 900000).toString();
+  res.json({ success: true, code: voucherCode, userId, amount });
 });
 
-// Get voucher by code
-app.get('/voucher/:code', async (req, res) => {
+// QR login example
+app.get("/qr-login/:userId", async (req, res) => {
   try {
-    const voucher = await Voucher.findOne({ code: req.params.code });
-    if (!voucher) return res.status(404).json({ error: 'Voucher not found' });
-    res.json(voucher);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ========================
-// Login (Manual + QR)
-// ========================
-
-// Manual login
-app.post('/login', async (req, res) => {
-  try {
-    const { code, pin } = req.body;
-    const voucher = await Voucher.findOne({ code, pin });
-    if (!voucher) return res.status(401).json({ error: 'Invalid login' });
-
-    const token = jwt.sign({ code: voucher.code }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    const token = jwt.sign({ userId: req.params.userId }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
-    res.json({ success: true, token, balance: voucher.balance });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    const loginUrl = `${process.env.FRONTEND_URL}/qr-login?token=${token}`;
+    const qrCodeDataURL = await QRCode.toDataURL(loginUrl);
 
-// Generate QR login link
-app.get('/qr/:code', async (req, res) => {
-  try {
-    const { code } = req.params;
-    const loginUrl = `${process.env.FRONTEND_URL}/qr-login?code=${code}`;
-
-    const qr = await QRCode.toDataURL(loginUrl);
-    res.json({ qr, loginUrl });
+    res.json({ loginUrl, qrCode: qrCodeDataURL });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Failed to generate QR login" });
   }
 });
 
 // ========================
 // Start Server
 // ========================
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
