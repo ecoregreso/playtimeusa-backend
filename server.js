@@ -1,3 +1,28 @@
+// server.js — add near the top
+const mongoose = require('mongoose');
+
+async function connectMongo() {
+  if (process.env.USE_IN_MEMORY_DB === 'true') {
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    const mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri();
+    await mongoose.connect(uri);
+    console.log('[DB] Connected to in-memory Mongo');
+  } else {
+    const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/playtimeusa';
+    await mongoose.connect(uri);
+    console.log('[DB] Connected to Mongo:', uri);
+  }
+}
+
+(async () => {
+  await connectMongo();
+
+  // …your existing app.listen(...) call goes here…
+  // If you call app.listen at the bottom, keep that; just ensure it runs after connectMongo().
+})();
+
+
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
