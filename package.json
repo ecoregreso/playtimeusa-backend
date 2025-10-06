@@ -1,22 +1,67 @@
-{
-  "name": "casino-backend",
-  "version": "1.0.0",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.6.1",
-    "express": "^4.21.2",
-    "json2csv": "^5.0.7",
-    "jsonwebtoken": "^9.0.2",
-    "qrcode": "^1.5.4",
-    "sequelize": "^6.37.3",
-    "sqlite3": "^5.1.7"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.10"
-  }
-}
+ {
+22
+	
+   "name": "casino-backend",
+33
+	
+   "version": "1.0.0",
+44
+	
+   "main": "server.js",
+55
+	
+   "scripts": {
+66
+	
+     "start": "node server.js",
+77
+	
+     "dev": "nodemon server.js"
+88
+	
+   },
+99
+	
+   "dependencies": {
+1010
+	
+     "cors": "^2.8.5",
+1111
+	
+     "dotenv": "^16.6.1",
+1212
+	
+     "express": "^4.21.2",
+1313
+	
+     "json2csv": "^5.0.7",
+1414
+	
+     "jsonwebtoken": "^9.0.2",
+15
+	
++    "mongoose": "^8.18.0",
+1516
+	
+     "qrcode": "^1.5.4",
+1617
+	
+     "sequelize": "^6.37.3",
+1718
+	
+     "sqlite3": "^5.1.7"
+1819
+	
+   },
+1920
+	
+   "devDependencies": {
+2021
+	
+     "nodemon": "^3.1.10"
+2122
+	
+   }
+2223
+	
+ }
