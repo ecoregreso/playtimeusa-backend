@@ -1,8 +1,23 @@
-const express = require('express'); const router = express.Router(); const admin = require('../controllers/adminReports');
-// dummy admin auth
-router.use((req,res,next)=>{ req.user={username:'admin', role:'admin'}; next(); });
-router.get('/financials', admin.financials);
-router.get('/game-stats', admin.gameStats);
-router.get('/player/:id/activity', admin.playerActivity);
-router.get('/player/:id/export', admin.exportPlayerCSV);
+const express = require('express');
+
+const adminReports = require('../controllers/adminReports');
+
+const router = express.Router();
+
+const attachAdminContext = (req, _res, next) => {
+  req.user = req.user || {
+    username: 'admin',
+    role: 'admin',
+    permissions: ['reports:read']
+  };
+  next();
+};
+
+router.use(attachAdminContext);
+
+router.get('/financials', adminReports.financials);
+router.get('/game-stats', adminReports.gameStats);
+router.get('/player/:id/activity', adminReports.playerActivity);
+router.get('/player/:id/export', adminReports.exportPlayerCSV);
+
 module.exports = router;
