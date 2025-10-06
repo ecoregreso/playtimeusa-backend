@@ -1,13 +1,17 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const voucherSchema = new mongoose.Schema({
-  userCode: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  amount: { type: Number, required: true },
-  bonus: { type: Number, required: true },
-  balance: { type: Number, required: true },
-  isUsed: { type: Boolean, default: false }
-});
+const voucherSchema = new mongoose.Schema(
+  {
+    userCode: { type: String, required: true, unique: true, index: true },
+    password: { type: String, required: true },
+    amount: { type: Number, required: true, min: 1 },
+    bonus: { type: Number, required: true, min: 0 },
+    balance: { type: Number, required: true, min: 0 },
+    isUsed: { type: Boolean, default: false }
+  },
+  {
+    timestamps: true
+  }
+);
 
-module.exports = mongoose.model("Voucher", voucherSchema);
-
+module.exports = mongoose.model('Voucher', voucherSchema);
