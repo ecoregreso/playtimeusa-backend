@@ -1,1 +1,598 @@
-gg
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cashier Voucher Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark light;
+        --bg-gradient: radial-gradient(circle at top, #1f2937, #0f172a 55%, #020617);
+        --card-bg: rgba(15, 23, 42, 0.8);
+        --card-border: rgba(148, 163, 184, 0.2);
+        --accent: #38bdf8;
+        --accent-strong: #0ea5e9;
+        --success: #22c55e;
+        --danger: #f97316;
+        --text-primary: #e2e8f0;
+        --text-muted: #94a3b8;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg-gradient);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1.25rem;
+      }
+
+      main {
+        width: min(1100px, 100%);
+        display: grid;
+        gap: 2rem;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      header h1 {
+        font-size: clamp(1.8rem, 4vw, 2.75rem);
+        margin: 0;
+        letter-spacing: -0.03em;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--text-muted);
+        max-width: 52ch;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .actions a {
+        text-decoration: none;
+        padding: 0.75rem 1.25rem;
+        border-radius: 999px;
+        background: rgba(56, 189, 248, 0.1);
+        color: var(--accent);
+        font-weight: 600;
+        transition: background 0.2s ease, transform 0.2s ease;
+      }
+
+      .actions a:hover,
+      .actions a:focus-visible {
+        background: rgba(14, 165, 233, 0.3);
+        outline: none;
+        transform: translateY(-1px);
+      }
+
+      section {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 1.25rem;
+        padding: clamp(1.5rem, 4vw, 2.25rem);
+        backdrop-filter: blur(24px);
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.45);
+      }
+
+      section h2 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        font-size: clamp(1.25rem, 3vw, 1.75rem);
+      }
+
+      form {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .field {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      input[type='number'] {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        border-radius: 0.85rem;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.6);
+        color: inherit;
+        font-size: 1rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      input[type='number']:focus {
+        outline: none;
+        border-color: rgba(56, 189, 248, 0.7);
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+      }
+
+      .quick-amounts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      .quick-amounts button {
+        flex: 1 1 110px;
+        padding: 0.75rem 1rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        background: rgba(148, 163, 184, 0.1);
+        color: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+      }
+
+      .quick-amounts button:hover,
+      .quick-amounts button:focus-visible {
+        transform: translateY(-1px);
+        background: rgba(56, 189, 248, 0.15);
+        border-color: rgba(56, 189, 248, 0.35);
+        outline: none;
+      }
+
+      .cta {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .cta button[type='submit'] {
+        padding: 0.85rem 1.75rem;
+        border-radius: 0.95rem;
+        border: none;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cta button[type='submit']:hover,
+      .cta button[type='submit']:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 30px rgba(14, 165, 233, 0.35);
+        outline: none;
+      }
+
+      .feedback {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        font-size: 0.95rem;
+      }
+
+      .feedback.success {
+        color: var(--success);
+      }
+
+      .feedback.error {
+        color: var(--danger);
+      }
+
+      .voucher-card {
+        display: grid;
+        gap: 1.25rem;
+        padding: 1.75rem;
+        border-radius: 1.25rem;
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        background: rgba(15, 23, 42, 0.65);
+        box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.15);
+        animation: fadeIn 0.35s ease;
+      }
+
+      .voucher-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .voucher-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        letter-spacing: 0.02em;
+      }
+
+      .voucher-meta {
+        display: grid;
+        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .meta-item {
+        display: grid;
+        gap: 0.35rem;
+        font-size: 0.95rem;
+      }
+
+      .meta-item span {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .qr-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .qr-wrapper img {
+        width: min(220px, 60vw);
+        aspect-ratio: 1 / 1;
+        border-radius: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: #fff;
+        padding: 0.75rem;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .button-row button,
+      .button-row a {
+        flex: 1 1 160px;
+        padding: 0.75rem 1rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(148, 163, 184, 0.12);
+        color: inherit;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+      }
+
+      .button-row button:hover,
+      .button-row button:focus-visible,
+      .button-row a:hover,
+      .button-row a:focus-visible {
+        transform: translateY(-1px);
+        background: rgba(56, 189, 248, 0.15);
+        border-color: rgba(56, 189, 248, 0.35);
+        outline: none;
+      }
+
+      .history-list {
+        display: grid;
+        gap: 1rem;
+        max-height: 360px;
+        overflow: auto;
+        padding-right: 0.5rem;
+      }
+
+      .history-card {
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 1rem;
+        padding: 1rem 1.25rem;
+        background: rgba(15, 23, 42, 0.55);
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .history-card strong {
+        font-size: 1rem;
+      }
+
+      .history-card span {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 2rem 1rem 3rem;
+        }
+
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .cta {
+          justify-content: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Cashier Voucher Console</h1>
+          <p>
+            Issue on-demand casino vouchers, share QR codes instantly, and monitor the
+            most recent payouts from a single secure dashboard.
+          </p>
+        </div>
+        <div class="actions">
+          <a href="/cashier" aria-current="page">Cashier</a>
+          <a href="/login.html">Player Login</a>
+        </div>
+      </header>
+
+      <section aria-labelledby="createVoucher">
+        <h2 id="createVoucher">Create a voucher</h2>
+        <form id="voucher-form">
+          <div class="field">
+            <label for="amount">Deposit amount (USD)</label>
+            <input
+              id="amount"
+              name="amount"
+              type="number"
+              min="1"
+              step="1"
+              inputmode="numeric"
+              placeholder="Enter amount"
+              required
+            />
+            <div class="quick-amounts" aria-label="Quick select amounts">
+              <button type="button" data-amount="50">$50</button>
+              <button type="button" data-amount="100">$100</button>
+              <button type="button" data-amount="250">$250</button>
+              <button type="button" data-amount="500">$500</button>
+            </div>
+          </div>
+          <div class="cta">
+            <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+            <button type="submit">Generate voucher</button>
+          </div>
+        </form>
+      </section>
+
+      <section aria-live="polite" aria-atomic="true">
+        <h2>Latest voucher</h2>
+        <div id="voucher-output" hidden>
+          <article class="voucher-card">
+            <div class="voucher-header">
+              <h3>Voucher ready to share</h3>
+              <div class="button-row">
+                <button type="button" id="copy-credentials">Copy credentials</button>
+                <a id="open-login" href="#" target="_blank" rel="noopener">Open login page</a>
+              </div>
+            </div>
+
+            <div class="voucher-meta">
+              <div class="meta-item">
+                <span>User Code</span>
+                <strong id="voucher-user"></strong>
+              </div>
+              <div class="meta-item">
+                <span>Password</span>
+                <strong id="voucher-password"></strong>
+              </div>
+              <div class="meta-item">
+                <span>Deposit</span>
+                <strong id="voucher-amount"></strong>
+              </div>
+              <div class="meta-item">
+                <span>Bonus</span>
+                <strong id="voucher-bonus"></strong>
+              </div>
+              <div class="meta-item">
+                <span>Total Balance</span>
+                <strong id="voucher-total"></strong>
+              </div>
+            </div>
+
+            <div class="qr-wrapper">
+              <img id="voucher-qr" alt="Voucher QR code" />
+              <a id="download-qr" download="voucher-qr.png">Download QR code</a>
+            </div>
+          </article>
+        </div>
+        <p id="empty-state">Generate a voucher to see details here.</p>
+      </section>
+
+      <section aria-labelledby="recentVouchers">
+        <h2 id="recentVouchers">Recent vouchers</h2>
+        <div class="history-list" id="voucher-history"></div>
+      </section>
+    </main>
+
+    <template id="history-item-template">
+      <article class="history-card">
+        <strong data-field="title"></strong>
+        <span data-field="timestamp"></span>
+        <span data-field="details"></span>
+      </article>
+    </template>
+
+    <script>
+      const form = document.getElementById('voucher-form');
+      const amountInput = document.getElementById('amount');
+      const feedback = document.getElementById('feedback');
+      const quickButtons = document.querySelectorAll('.quick-amounts button');
+
+      const voucherOutput = document.getElementById('voucher-output');
+      const emptyState = document.getElementById('empty-state');
+      const voucherUser = document.getElementById('voucher-user');
+      const voucherPassword = document.getElementById('voucher-password');
+      const voucherAmount = document.getElementById('voucher-amount');
+      const voucherBonus = document.getElementById('voucher-bonus');
+      const voucherTotal = document.getElementById('voucher-total');
+      const voucherQr = document.getElementById('voucher-qr');
+      const openLogin = document.getElementById('open-login');
+      const copyCredentials = document.getElementById('copy-credentials');
+      const downloadQr = document.getElementById('download-qr');
+      const historyList = document.getElementById('voucher-history');
+      const historyTemplate = document.getElementById('history-item-template');
+
+      const formatter = new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+      });
+
+      quickButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          amountInput.value = button.dataset.amount;
+          amountInput.focus();
+        });
+      });
+
+      const setFeedback = (message, type) => {
+        feedback.textContent = message;
+        feedback.className = `feedback ${type ?? ''}`;
+      };
+
+      const clearFeedback = () => {
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+      };
+
+      const renderVoucher = (voucher) => {
+        voucherUser.textContent = voucher.userCode;
+        voucherPassword.textContent = voucher.password;
+        voucherAmount.textContent = formatter.format(voucher.amount);
+        voucherBonus.textContent = formatter.format(voucher.bonus);
+        voucherTotal.textContent = formatter.format(voucher.balance);
+        voucherQr.src = voucher.qrCode;
+        openLogin.href = voucher.loginUrl;
+        downloadQr.href = voucher.qrCode;
+
+        voucherOutput.hidden = false;
+        emptyState.hidden = true;
+      };
+
+      const appendHistory = (voucher, { prepend = false } = {}) => {
+        const entry = historyTemplate.content.firstElementChild.cloneNode(true);
+        const created = voucher.createdAt ? new Date(voucher.createdAt) : new Date();
+        entry.querySelector('[data-field="title"]').textContent = `Voucher #${voucher.userCode}`;
+        entry.querySelector('[data-field="timestamp"]').textContent = created.toLocaleString();
+        entry.querySelector('[data-field="details"]').textContent = `Deposit ${formatter.format(
+          voucher.amount
+        )} | Bonus ${formatter.format(voucher.bonus)} | Total ${formatter.format(
+          voucher.balance
+        )}`;
+        if (prepend) {
+          historyList.prepend(entry);
+        } else {
+          historyList.append(entry);
+        }
+        while (historyList.children.length > 25) {
+          historyList.removeChild(historyList.lastElementChild);
+        }
+      };
+
+      const fetchRecentVouchers = async () => {
+        try {
+          const response = await fetch('/api/cashier/voucher');
+          if (!response.ok) throw new Error('Unable to load vouchers');
+          const vouchers = await response.json();
+          historyList.innerHTML = '';
+          if (!vouchers.length) {
+            historyList.innerHTML = '<p>No vouchers generated yet.</p>';
+            return;
+          }
+          vouchers.forEach((voucher) => appendHistory(voucher));
+        } catch (error) {
+          historyList.innerHTML = `<p class="feedback error">${error.message}</p>`;
+        }
+      };
+
+      copyCredentials.addEventListener('click', async () => {
+        const payload = `User Code: ${voucherUser.textContent}\nPassword: ${voucherPassword.textContent}`;
+        try {
+          await navigator.clipboard.writeText(payload);
+          setFeedback('Voucher credentials copied to clipboard.', 'success');
+          setTimeout(clearFeedback, 3000);
+        } catch (error) {
+          setFeedback('Unable to copy to clipboard.', 'error');
+        }
+      });
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        clearFeedback();
+
+        const amount = Number(amountInput.value);
+        if (!amount || Number.isNaN(amount) || amount <= 0) {
+          setFeedback('Enter a valid amount greater than 0.', 'error');
+          return;
+        }
+
+        try {
+          setFeedback('Generating voucher…', '');
+          const response = await fetch('/api/cashier/voucher', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount })
+          });
+
+          if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Failed to create voucher.' }));
+            throw new Error(error.error || 'Failed to create voucher.');
+          }
+
+          const voucher = await response.json();
+          renderVoucher(voucher);
+          appendHistory(voucher, { prepend: true });
+          setFeedback('Voucher generated successfully.', 'success');
+          form.reset();
+        } catch (error) {
+          console.error(error);
+          setFeedback(error.message, 'error');
+        }
+      });
+
+      fetchRecentVouchers();
+    </script>
+  </body>
+</html>
