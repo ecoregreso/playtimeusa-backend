@@ -1,16 +1,26 @@
-const { Sequelize } = require('sequelize');
-require('dotenv').config();
+const sequelize = require('../config/database');
+const Player = require('./Player');
+const Voucher = require('./Voucher');
+const Transaction = require('./Transaction');
+const Bet = require('./Bet');
+const initGame = require('./Game');
 
-const sequelize = new Sequelize(process.env.DB_URI, {
-  dialect: 'mysql', // or 'postgres', 'sqlite', etc.
-});
+const Game = initGame(sequelize);
 
-// Import your models
-const Game = require('./game')(sequelize);
+Player.hasMany(Voucher, { foreignKey: 'playerId', as: 'vouchers' });
+Voucher.belongsTo(Player, { foreignKey: 'playerId', as: 'player' });
 
-// Export sequelize and models
+Player.hasMany(Transaction, { foreignKey: 'playerId', as: 'transactions' });
+Transaction.belongsTo(Player, { foreignKey: 'playerId', as: 'player' });
+
+Voucher.hasMany(Transaction, { foreignKey: 'voucherId', as: 'transactions' });
+Transaction.belongsTo(Voucher, { foreignKey: 'voucherId', as: 'voucher' });
+
 module.exports = {
   sequelize,
-  Game,
+  Player,
+  Voucher,
+  Transaction,
+  Bet,
+  Game
 };
-
