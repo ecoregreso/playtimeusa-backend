@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player Voucher Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark light;
+        --bg: radial-gradient(circle at 20% 20%, #1e293b, #0f172a 60%, #020617 100%);
+        --card: rgba(15, 23, 42, 0.82);
+        --border: rgba(148, 163, 184, 0.25);
+        --accent: #38bdf8;
+        --accent-strong: #0ea5e9;
+        --success: #22c55e;
+        --danger: #f87171;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3.5rem 1.25rem;
+      }
+
+      main {
+        width: min(420px, 100%);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 1.5rem;
+        padding: 2.5rem clamp(1.5rem, 4vw, 2.5rem);
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(28px);
+        display: grid;
+        gap: 2rem;
+      }
+
+      header {
+        display: grid;
+        gap: 0.75rem;
+        text-align: center;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: clamp(1.75rem, 5vw, 2.25rem);
+        letter-spacing: -0.02em;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      form {
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      label {
+        display: grid;
+        gap: 0.5rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--muted);
+        text-align: left;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.65);
+        color: inherit;
+        font-size: 1rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: rgba(14, 165, 233, 0.55);
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18);
+      }
+
+      button {
+        padding: 0.95rem 1rem;
+        border-radius: 0.95rem;
+        border: none;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      button:hover,
+      button:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 32px rgba(14, 165, 233, 0.35);
+        outline: none;
+      }
+
+      .status {
+        min-height: 1.35rem;
+        font-size: 0.95rem;
+        text-align: center;
+      }
+
+      .status.success {
+        color: var(--success);
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      .balances {
+        display: grid;
+        gap: 0.5rem;
+        text-align: center;
+      }
+
+      .balances strong {
+        font-size: 2rem;
+        letter-spacing: 0.01em;
+      }
+
+      .balances span {
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      footer {
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      footer a:hover,
+      footer a:focus-visible {
+        text-decoration: underline;
+        outline: none;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 2.75rem 1rem;
+        }
+
+        main {
+          border-radius: 1.25rem;
+          padding: 2rem 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Player Login</h1>
+        <p>Scan the QR code or enter your voucher credentials to start playing instantly.</p>
+      </header>
+
+      <form id="login-form">
+        <label>
+          User code
+          <input id="userCode" name="userCode" inputmode="numeric" autocomplete="one-time-code" required />
+        </label>
+        <label>
+          Password
+          <input
+            id="password"
+            name="password"
+            type="password"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            required
+          />
+        </label>
+        <button type="submit">Sign in</button>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="balances" id="balances" hidden>
+        <strong id="balance"></strong>
+        <span>Voucher balance</span>
+      </div>
+
+      <footer>
+        Need to issue a new voucher? <a href="/cashier.html">Return to the cashier console</a>.
+      </footer>
+    </main>
+
+    <script>
+      const form = document.getElementById('login-form');
+      const userCodeInput = document.getElementById('userCode');
+      const passwordInput = document.getElementById('password');
+      const statusEl = document.getElementById('status');
+      const balances = document.getElementById('balances');
+      const balanceValue = document.getElementById('balance');
+
+      const setStatus = (message, type) => {
+        statusEl.textContent = message;
+        statusEl.className = `status ${type ?? ''}`;
+      };
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        balances.hidden = true;
+        setStatus('Signing in…');
+
+        try {
+          const response = await fetch('/api/player/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userCode: userCodeInput.value.trim(),
+              password: passwordInput.value.trim()
+            })
+          });
+
+          if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Login failed.' }));
+            throw new Error(error.error || 'Login failed.');
+          }
+
+          const { balance } = await response.json();
+          const formatted = new Intl.NumberFormat(undefined, {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+          }).format(balance);
+
+          balanceValue.textContent = formatted;
+          balances.hidden = false;
+          setStatus('Voucher accepted. Enjoy your games!', 'success');
+        } catch (error) {
+          console.error(error);
+          setStatus(error.message, 'error');
+        }
+      });
+
+      const params = new URLSearchParams(window.location.search);
+      const initialUser = params.get('user');
+      const initialPass = params.get('pass');
+      if (initialUser) userCodeInput.value = initialUser;
+      if (initialPass) passwordInput.value = initialPass;
+
+      if (initialUser && initialPass) {
+        passwordInput.type = 'text';
+        setTimeout(() => {
+          passwordInput.type = 'password';
+        }, 2000);
+        setTimeout(() => {
+          form.requestSubmit();
+        }, 150);
+      }
+    </script>
+  </body>
+</html>
