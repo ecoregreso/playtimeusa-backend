@@ -1,48 +1,68 @@
-const jwt = require('jsonwebtoken');
-const { Player } = require('../models');
 const QRCode = require('qrcode');
 
-exports.createVoucher = async (req, res) => {
-  const { amount } = req.body;
-  if (!amount) return res.status(400).json({ error: 'Amount required' });
-exports.listVouchers = async (req, res) => {
+const Voucher = require('../models/Voucher');
+const Transaction = require('../models/Transaction');
+
+const sanitizeBaseUrl = (url) => (url.endsWith('/') ? url.slice(0, -1) : url);
+const FRONTEND_BASE_URL = sanitizeBaseUrl(
+  process.env.FRONTEND_URL || process.env.PUBLIC_URL || 'http://localhost:3000'
+);
+
+exports.listVouchers = async (_req, res) => {
   try {
-    const vouchers = await Voucher.find(); // assuming Mongoose/DB
+    const vouchers = await Voucher.find().sort({ createdAt: -1 }).limit(25);
     res.json(vouchers);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch vouchers', details: error.message });
   }
 };
 
-  // Generate random credentials
-  const userCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const pin = Math.floor(100000 + Math.random() * 900000).toString();
+exports.createVoucher = async (req, res) => {
+  try {
+    const amount = Number(req.body.amount);
 
-  // Create player in DB
-  const player = await Player.create({
-    username: userCode,
-    pin: pin,
-    mainBalance: amount,
-    bonusBalance: (amount * 0.5).toFixed(2),
-  });
+    if (!amount || Number.isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ error: 'A valid amount greater than 0 is required.' });
+    }
 
-  // Generate JWT token for QR auto-login
-  const token = jwt.sign(
-    { playerId: player.id, oneTime: true },
-    process.env.JWT_SECRET,
-    { expiresIn: '2h' }
-  );
+    const userCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const password = Math.floor(100000 + Math.random() * 900000).toString();
+    const bonus = Math.round(amount * 0.5);
+    const balance = amount + bonus;
 
-  const loginUrl = `${process.env.FRONTEND_URL}/login.html?token=${token}`;
-  const qrCode = await QRCode.toDataURL(loginUrl);
+    const voucher = await Voucher.create({
+      userCode,
+      password,
+      amount,
+      bonus,
+      balance
+    });
 
-  res.json({
-    userCode,
-    pin,
-    amount,
-    bonus: player.bonusBalance,
-    loginUrl,
-    qrCode
-  });
+    await Transaction.create({
+      type: 'deposit',
+      amount: balance,
+      balanceAfter: balance,
+      userCode
+    });
+
+    const loginUrl = `${FRONTEND_BASE_URL}/login.html?user=${encodeURIComponent(
+      userCode
+    )}&pass=${encodeURIComponent(password)}`;
+    const qrCode = await QRCode.toDataURL(loginUrl);
+
+    res.status(201).json({
+      voucherId: voucher.id,
+      userCode,
+      password,
+      amount,
+      bonus,
+      balance,
+      loginUrl,
+      qrCode,
+      createdAt: voucher.createdAt
+    });
+  } catch (error) {
+    console.error('Voucher error:', error);
+    res.status(500).json({ error: 'Failed to create voucher', details: error.message });
+  }
 };
-
