@@ -155,4 +155,4 @@ app.post('/api/game/spin', auth, async (req, res) => {
   try { await connectMongo(); app.listen(PORT, () => console.log(`▶ PlaytimeUSA API listening on ${PORT}`)); }
   catch (e) { console.error('Fatal startup error:', e); process.exit(1); }
 })();
-JS
+
