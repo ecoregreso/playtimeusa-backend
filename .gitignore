@@ -2,6 +2,8 @@ node_modules/
 .env
 database.sqlite
 *.sqlite
+*.sqlite-shm
+*.sqlite-wal
 .DS_Store
 npm-debug.log
 # any local secret or build artifacts
