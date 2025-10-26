@@ -369,6 +369,10 @@
 
       <section aria-labelledby="createVoucher">
         <h2 id="createVoucher">Create a voucher</h2>
+        <div class="field">
+          <label for="adminKey">Admin Key (required for API)</label>
+          <input id="adminKey" name="adminKey" type="password" placeholder="Enter admin key" />
+        </div>
         <form id="voucher-form">
           <div class="field">
             <label for="amount">Deposit amount (USD)</label>
@@ -456,6 +460,13 @@
 
     <script>
       const form = document.getElementById('voucher-form');
+      const adminKeyInput = document.getElementById('adminKey');
+      // persist admin key in session only
+      adminKeyInput.value = sessionStorage.getItem('ADMIN_KEY') || '';
+      adminKeyInput.addEventListener('change', () => {
+        sessionStorage.setItem('ADMIN_KEY', adminKeyInput.value);
+      });
+
       const amountInput = document.getElementById('amount');
       const feedback = document.getElementById('feedback');
       const quickButtons = document.querySelectorAll('.quick-amounts button');
@@ -572,7 +583,10 @@
           setFeedback('Generating voucher…', '');
           const response = await fetch('/api/cashier/voucher', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Admin-Key': adminKeyInput.value || sessionStorage.getItem('ADMIN_KEY') || ''
+            },
             body: JSON.stringify({ amount })
           });
 
@@ -592,7 +606,20 @@
         }
       });
 
-      fetchRecentVouchers();
+      const loadRecent = async () => {
+        try {
+          const response = await fetch('/api/cashier/voucher', {
+            headers: { 'X-Admin-Key': adminKeyInput.value || sessionStorage.getItem('ADMIN_KEY') || '' }
+          });
+          if (!response.ok) return; // ignore unauthorized for now
+          const vouchers = await response.json();
+          historyList.innerHTML = '';
+          vouchers.forEach((v) => appendHistory(v));
+        } catch {}
+      };
+
+      fetchRecentVouchers = loadRecent;
+      loadRecent();
     </script>
   </body>
 </html>
