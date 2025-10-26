@@ -77,9 +77,9 @@ exports.createVoucher = async (req, res) => {
       userCode
     });
 
-    const loginUrl = `${FRONTEND_BASE_URL}/login?userCode=${encodeURIComponent(
+    const loginUrl = `${FRONTEND_BASE_URL}/login.html?user=${encodeURIComponent(
       userCode
-    )}&pin=${encodeURIComponent(password)}`;
+    )}&pass=${encodeURIComponent(password)}`;
 
     const qrCode = await QRCode.toDataURL(loginUrl);
 
