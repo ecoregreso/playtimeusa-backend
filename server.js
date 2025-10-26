@@ -11,12 +11,14 @@ const jwt = require('jsonwebtoken');
 
 const PORT = process.env.PORT || 3000;
 const DB_FILE = process.env.DB_FILE || path.join(__dirname, 'database.sqlite');
-const ORIGIN = process.env.FRONTEND_ORIGIN || '*';
+const ORIGINS = process.env.FRONTEND_ORIGIN 
+  ? process.env.FRONTEND_ORIGIN.split(',').map(s => s.trim())
+  : '*';
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
 const ADMIN_KEY = process.env.ADMIN_KEY || 'dev-admin-key';
 
 const app = express();
-app.use(cors({ origin: ORIGIN, credentials: true }));
+app.use(cors({ origin: ORIGINS, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -64,6 +66,12 @@ async function runMigrations() {
     fun_balance INTEGER NOT NULL DEFAULT 0
   )`);
   await ensureFunBalanceColumn();
+
+  // Create a default test user if none exists
+  const userCount = await get(`SELECT COUNT(*) as count FROM users`);
+  if (userCount.count === 0) {
+    await run(`INSERT INTO users(id, email) VALUES(1, 'player@playtimeusa.net')`);
+  }
 
   await run(`CREATE TABLE IF NOT EXISTS vouchers(
     id INTEGER PRIMARY KEY,

@@ -14,12 +14,10 @@ services:
 
     envVars:
       # Secrets: set values in the Render dashboard after first deploy.
-      - key: MONGO_URI
-        sync: false        # don't overwrite; value lives in dashboard
       - key: JWT_SECRET
         sync: false
+      - key: ADMIN_KEY
+        sync: false
       # Non-secrets you want tracked in git:
-      - key: FRONTEND_URL
-        value: "https://playtimeusa.net"
-      - key: CORS_ORIGINS
+      - key: FRONTEND_ORIGIN
         value: "https://playtimeusa.net,https://games.playtimeusa.net"
