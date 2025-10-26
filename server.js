@@ -67,6 +67,12 @@ async function runMigrations() {
   )`);
   await ensureFunBalanceColumn();
 
+  // Create a default test user if none exists
+  const userCount = await get(`SELECT COUNT(*) as count FROM users`);
+  if (userCount.count === 0) {
+    await run(`INSERT INTO users(id, email) VALUES(1, 'player@playtimeusa.net')`);
+  }
+
   await run(`CREATE TABLE IF NOT EXISTS vouchers(
     id INTEGER PRIMARY KEY,
     code TEXT NOT NULL UNIQUE,
