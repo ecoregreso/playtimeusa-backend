@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+    image: ghcr.io/playtimeusa/playtimeusa-backend:latest
+    container_name: playtimeusa-api
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_URI: mongodb://mongo:27017/playtimeusa
+      JWT_SECRET: super-secure-change-me
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "3000:3000"
+    depends_on:
+      mongo:
+        condition: service_started
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7.0
+    container_name: playtimeusa-mongo
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
