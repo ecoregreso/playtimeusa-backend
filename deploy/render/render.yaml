@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: playtimeusa-backend
+    runtime: node
+    plan: starter
+    region: oregon
+    autoDeploy: true
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://playtimeusa-frontend.onrender.com
+      - key: DB_URI
+        fromDatabase:
+          name: playtimeusa-mongodb
+          property: connectionString
+
+databases:
+  - name: playtimeusa-mongodb
+    plan: starter
