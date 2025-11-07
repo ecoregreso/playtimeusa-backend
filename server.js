@@ -1,4 +1,3 @@
-+14-0
 // server.js
 require('dotenv').config();
 
@@ -15,6 +14,7 @@ const featureModules = require('./modules');
 const PORT = process.env.PORT || 3000;
 const DB_FILE = process.env.DB_FILE || path.join(__dirname, 'database.sqlite');
 const ORIGINS = process.env.FRONTEND_ORIGIN 
+const ORIGINS = process.env.FRONTEND_ORIGIN
   ? process.env.FRONTEND_ORIGIN.split(',').map(s => s.trim())
   : '*';
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
@@ -37,7 +37,10 @@ const get = (sql, params = []) =>
   new Promise((resolve, reject) => db.get(sql, params, (err, row) => {
     if (err) reject(err); else resolve(row);
   }));
-@@ -83,50 +85,56 @@ async function runMigrations() {
+const all = (sql, params = []) =>
+  new Promise((resolve, reject) => db.all(sql, params, (err, rows) => {
+    if (err) reject(err); else resolve(rows);
+@@ -83,50 +84,56 @@ async function runMigrations() {
     active INTEGER NOT NULL DEFAULT 1,
     expires_at DATETIME,
     created_by INTEGER,
@@ -94,7 +97,7 @@ function authUser(req, res, next) {
   return res.status(401).json({ ok: false, error: 'unauthorized' });
 }
 
-@@ -332,39 +340,45 @@ app.post(
+@@ -332,39 +339,45 @@ app.post(
           };
 
           credit((e2) => {
