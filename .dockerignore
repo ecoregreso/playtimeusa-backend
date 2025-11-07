@@ -1,0 +1,27 @@
+# Node dependencies and build outputs
+node_modules
+npm-debug.log*
+yarn-error.log*
+coverage
+.tmp
+.DS_Store
+
+# Environment and local state
+.env
+.env.*
+!.env.example
+database.sqlite
+
+# Git & editor artifacts
+.git
+.gitignore
+.vscode
+.idea
+
+# Docker/Compose artifacts
+Dockerfile*
+docker-compose*.yml
+
+# Tests and docs (not needed in production image)
+tests
+README.md
