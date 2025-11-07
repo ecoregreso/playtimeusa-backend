@@ -1,3 +1,31 @@
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
 {
   "name": "casino-backend",
   "version": "1.0.0",
@@ -6,7 +34,6 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
     "dev": "nodemon server.js",
     "test": "node scripts/test-runner.js"
   },
