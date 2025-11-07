@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
 
@@ -32,11 +34,21 @@ function loadModule(directory) {
   };
 }
 
-const featureModules = fs
+const loadedModules = fs
   .readdirSync(modulesDir, { withFileTypes: true })
   .filter((dirent) => dirent.isDirectory())
   .map((dirent) => loadModule(dirent.name))
-  .sort((a, b) => a.priority - b.priority)
-  .map((entry) => entry.module);
+  .sort((a, b) => a.priority - b.priority);
+
+const featureModules = Object.freeze(loadedModules.map((entry) => entry.module));
+const moduleMetadata = Object.freeze(
+  loadedModules.map(({ name, priority }) => Object.freeze({ name, priority }))
+);
 
 module.exports = featureModules;
+Object.defineProperty(module.exports, 'metadata', {
+  value: moduleMetadata,
+  enumerable: false,
+  configurable: false,
+  writable: false
+});
