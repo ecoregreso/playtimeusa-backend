@@ -8,3 +8,4 @@ database.sqlite
 npm-debug.log
 # any local secret or build artifacts
 node_modules/
+node_modules/
