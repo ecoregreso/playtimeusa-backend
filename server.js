@@ -23,16 +23,10 @@ app.use(express.json());
 // ========================
 // MongoDB Connection
 // ========================
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB Atlas"))
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err.message);
 const connectWithRetry = async (attempt = 1) => {
   if (!MONGO_URI) {
     console.error("❌ Missing DB_URI environment variable. Unable to connect to MongoDB.");
     process.exit(1);
-  });
   }
 
   try {
@@ -88,7 +82,6 @@ app.post("/api/cashier/voucher", async (req, res) => {
     const bonus = Math.floor(amount * 0.5);
     const balance = amount + bonus;
 
-    const voucher = await Voucher.create({ userCode, password, amount, bonus, balance });
     const voucher = await Voucher.create({ userCode, pin, amount, bonus, balance });
 
     await Transaction.create({
@@ -99,10 +92,8 @@ app.post("/api/cashier/voucher", async (req, res) => {
     });
 
     const loginUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/login.html`;
-    const qrCode = await QRCode.toDataURL(`${loginUrl}?user=${userCode}&pass=${password}`);
     const qrCode = await QRCode.toDataURL(`${loginUrl}?user=${userCode}&pass=${pin}`);
 
-    res.json({ userCode, password, amount, bonus, balance, loginUrl, qrCode });
     res.json({ userCode, pin, amount, bonus, balance, loginUrl, qrCode });
   } catch (err) {
     console.error("Voucher error:", err);
@@ -113,8 +104,6 @@ app.post("/api/cashier/voucher", async (req, res) => {
 // Player: Login with voucher
 app.post("/api/player/login", async (req, res) => {
   try {
-    const { userCode, password } = req.body;
-    const voucher = await Voucher.findOne({ userCode, password, isUsed: false });
     const { userCode, pin } = req.body;
     const voucher = await Voucher.findOne({ userCode, pin, isUsed: false });
 
@@ -142,35 +131,63 @@ app.post("/api/game/spin", async (req, res) => {
 
     const voucher = await Voucher.findById(decoded.id);
     if (!voucher) return res.status(404).json({ error: "Player not found" });
-@@ -175,29 +206,32 @@ app.get("/api/admin/financials/:userCode", async (req, res) => {
-    { $group: { _id: null, total: { $sum: "$amount" } } }
-  ]);
-  const wins = await Transaction.aggregate([
-    { $match: { type: "win", userCode } },
-    { $group: { _id: null, total: { $sum: "$amount" } } }
-  ]);
 
-  res.json({
-    userCode,
-    deposits: deposits[0]?.total || 0,
-    bets: bets[0]?.total || 0,
-    wins: wins[0]?.total || 0,
-    profit: (bets[0]?.total || 0) + (wins[0]?.total || 0)
-  });
+    // TODO: Implement spin logic here
+    res.json({ message: "Spin endpoint not implemented yet" });
+  } catch (err) {
+    console.error("Spin error:", err);
+    res.status(500).json({ error: "Spin failed" });
+  }
 });
 
+// Admin: Get player stats
+app.get("/api/admin/stats/:userCode", async (req, res) => {
+  try {
+    const { userCode } = req.params;
+    
+    const deposits = await Transaction.aggregate([
+      { $match: { type: "deposit", userCode } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+
+    const bets = await Transaction.aggregate([
+      { $match: { type: "bet", userCode } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+
+    const wins = await Transaction.aggregate([
+      { $match: { type: "win", userCode } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+
+    res.json({
+      userCode,
+      deposits: deposits[0]?.total || 0,
+      bets: bets[0]?.total || 0,
+      wins: wins[0]?.total || 0,
+      profit: (bets[0]?.total || 0) - (wins[0]?.total || 0)
+    });
+  } catch (err) {
+    console.error("Stats error:", err);
+    res.status(500).json({ error: "Failed to get stats" });
+  }
+});
+
+// Admin: Get player transactions
 app.get("/api/admin/transactions/:userCode", async (req, res) => {
-  const { userCode } = req.params;
-  const txns = await Transaction.find({ userCode }).sort({ createdAt: -1 });
-  res.json(txns);
+  try {
+    const { userCode } = req.params;
+    const txns = await Transaction.find({ userCode }).sort({ createdAt: -1 });
+    res.json(txns);
+  } catch (err) {
+    console.error("Transactions error:", err);
+    res.status(500).json({ error: "Failed to get transactions" });
+  }
 });
 
 // ========================
 // Start Server
 // ========================
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
 if (process.env.NODE_ENV !== "test") {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
