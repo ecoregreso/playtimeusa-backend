@@ -6,7 +6,8 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "render-build": "npm ci",
-    "render-start": "npm start"
+    "render-start": "npm start",
+    "test": "jest"
   },
   "engines": {
     "node": ">=18 <23"
