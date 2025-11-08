@@ -7,3 +7,4 @@ database.sqlite
 .DS_Store
 npm-debug.log
 # any local secret or build artifacts
+node_modules/
