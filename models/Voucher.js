@@ -6,3 +6,5 @@ const VoucherSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Voucher", VoucherSchema);
+// models/Voucher.js (after schema)
+VoucherSchema.index({ createdAt: -1 });
