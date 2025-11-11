@@ -15,6 +15,6 @@ describe("POST /api/cashier/voucher", () => {
   it("returns 400 when amount is missing", async () => {
     const res = await request(app).post("/api/cashier/voucher").send({});
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ error: "Invalid fun-coin amount" });
+    expect(res.body).toEqual({ error: "Invalid fun-coin amount", code: 400 });
   });
 });
